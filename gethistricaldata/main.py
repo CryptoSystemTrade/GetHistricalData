@@ -1,11 +1,13 @@
-import requests
-import os
-from os.path import join, dirname
-from dotenv import load_dotenv
-import json
-import pandas as pd
 import datetime
+import json
+import os
+from os.path import dirname, join
+from typing import Dict, Union
+
 import boto3
+import pandas as pd
+import requests
+from dotenv import load_dotenv
 
 load_dotenv(verbose=True)
 env_path = join(dirname(__file__), ".env")
@@ -21,26 +23,22 @@ base_uri = "http://open-api.coinglass.com/api/pro/v1/futures/"
 headers = {"coinglassSecret": COINGLASS_TOKEN}
 
 
-def main():
+def main() -> None:
     """
     coingrass.comから各種ヒストリカルデータを取得する関数
 
     """
-    try:
-        print("start get data")
+    print("start get data")
 
-        print("get L/S chart")
-        get_ls_rate()
+    print("get L/S chart")
+    get_ls_rate()
+
+    print("save hdf5 into spaces")
+    # 取得したh5ファイルをすべてSpaceに保存し、ローカルからは削除
+    hdf_into_space()
 
 
-
-        print("save hdf5 into spaces")
-        # 取得したh5ファイルをすべてSpaceに保存し、ローカルからは削除
-        hdf_into_space()
-    except:
-        print("error")
-
-def get_ls_rate():
+def get_ls_rate() -> None:
     """
     LS比率をcoinglassから取得してHDF形式で保存
     """
@@ -51,7 +49,7 @@ def get_ls_rate():
     ]
 
     for currency in currencys:
-        params = {"interval": 2, "symbol": currency}
+        params: Dict[str, Union[int, str]] = {"interval": 2, "symbol": currency}
         res = requests.get(url, headers=headers, params=params)
 
         res_json = json.loads(res.text)
@@ -86,7 +84,7 @@ def get_ls_rate():
             h5.close()
 
 
-def hdf_into_space():
+def hdf_into_space() -> None:
     """
     dataフォルダ内にあるh5形式のファイルをすべてspaceに保存してdataからは削除
     """
@@ -101,15 +99,11 @@ def hdf_into_space():
     space_name = "boolion"
     for dir_name in os.listdir("histrical-data"):
         for file_name in os.listdir("histrical-data/" + dir_name):
-            file_path =  "histrical-data/" + dir_name + "/" + file_name
-            try:
-                client.upload_file(file_path, space_name, file_path)
+            file_path = "histrical-data/" + dir_name + "/" + file_name
+            client.upload_file(file_path, space_name, file_path)
 
-                #成功した場合はファイル削除
-                os.remove(file_path)
-            except:
-                print("upload Error")
-
+            # 成功した場合はファイル削除
+            os.remove(file_path)
 
 
 if __name__ == "__main__":
