@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 import json
 import pandas as pd
 import datetime
-import time
+import boto3
 
 load_dotenv(verbose=True)
 env_path = join(dirname(__file__), ".env")
@@ -13,6 +13,10 @@ load_dotenv(env_path)
 
 
 COINGLASS_TOKEN = os.environ.get("COINGLASS_TOKEN")
+SPACE_SECRET = os.environ.get("SPACE_SECRET")
+SPACE_KEY = os.environ.get("SPACE_KEY")
+
+
 base_uri = "http://open-api.coinglass.com/api/pro/v1/futures/"
 headers = {"coinglassSecret": COINGLASS_TOKEN}
 
@@ -22,12 +26,24 @@ def main():
     coingrass.comから各種ヒストリカルデータを取得する関数
 
     """
-    print("start get data")
+    try:
+        print("start get data")
 
-    print("get L/S chart")
+        print("get L/S chart")
+        get_ls_rate()
 
+
+
+        print("save hdf5 into spaces")
+        # 取得したh5ファイルをすべてSpaceに保存し、ローカルからは削除
+        hdf_into_space()
+    except:
+        print("error")
 
 def get_ls_rate():
+    """
+    LS比率をcoinglassから取得してHDF形式で保存
+    """
     url = base_uri + "longShort_chart"
     currencys = [
         "BTC",
@@ -63,11 +79,36 @@ def get_ls_rate():
             # 日付切り替え時刻+9時間のtimestampになるので修正
             s_timestamp = pd.Timestamp(year, month, day) + datetime.timedelta(hours=-9)
             e_timestamp = pd.Timestamp(year, month, day) + datetime.timedelta(hours=-9) + datetime.timedelta(days=1)
-            df = df[(df['timestamp'] >= s_timestamp.timestamp()) &  (df["timestamp"] < e_timestamp.timestamp())]
+            df = df[(df["timestamp"] >= s_timestamp.timestamp()) & (df["timestamp"] < e_timestamp.timestamp())]
 
-            h5 = pd.HDFStore(f"data/{year}_{month}_{day}.h5","w")
+            h5 = pd.HDFStore(f"histrical-data/{year}_{month}_{day}.h5", "w")
             h5["data"] = df
             h5.close()
+
+
+def hdf_into_space():
+    """
+    dataフォルダ内にあるh5形式のファイルをすべてspaceに保存してdataからは削除
+    """
+    session = boto3.session.Session()
+    client = session.client(
+        "s3",
+        region_name="sgp1",
+        endpoint_url="https://sgp1.digitaloceanspaces.com/",
+        aws_access_key_id=SPACE_KEY,
+        aws_secret_access_key=SPACE_SECRET,
+    )
+    space_name = "boolion"
+    for dir_name in os.listdir("histrical-data"):
+        for file_name in os.listdir("histrical-data/" + dir_name):
+            file_path =  "histrical-data/" + dir_name + "/" + file_name
+            try:
+                client.upload_file(file_path, space_name, file_path)
+
+                #成功した場合はファイル削除
+                os.remove(file_path)
+            except:
+                print("upload Error")
 
 
 
