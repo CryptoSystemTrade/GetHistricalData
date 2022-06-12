@@ -2,13 +2,13 @@ import datetime
 import json
 import os
 from os.path import dirname, join
+from pathlib import Path
 from typing import Dict, Union
 
 import boto3
 import pandas as pd
 import requests
 from dotenv import load_dotenv
-from pathlib import Path
 
 load_dotenv(verbose=True)
 env_path = join(dirname(__file__), ".env")
