@@ -8,6 +8,7 @@ import boto3
 import pandas as pd
 import requests
 from dotenv import load_dotenv
+from pathlib import Path
 
 load_dotenv(verbose=True)
 env_path = join(dirname(__file__), ".env")
@@ -31,7 +32,7 @@ def main() -> None:
     print("start get data")
 
     print("get L/S chart")
-    get_ls_rate()
+    # get_ls_rate()
 
     print("save hdf5 into spaces")
     # 取得したh5ファイルをすべてSpaceに保存し、ローカルからは削除
@@ -79,7 +80,11 @@ def get_ls_rate() -> None:
             e_timestamp = pd.Timestamp(year, month, day) + datetime.timedelta(hours=-9) + datetime.timedelta(days=1)
             df = df[(df["timestamp"] >= s_timestamp.timestamp()) & (df["timestamp"] < e_timestamp.timestamp())]
 
-            h5 = pd.HDFStore(f"histrical-data/{year}_{month}_{day}.h5", "w")
+            # パスを指定
+            dir_path = f"histrical-data/ls/{year}/{month}"
+            file_name = f"{year}_{month}_{day}_{currency}.h5"
+            os.makedirs(dir_path, exist_ok=True)
+            h5 = pd.HDFStore(dir_path + "/" + file_name, "w")
             h5["data"] = df
             h5.close()
 
@@ -97,13 +102,10 @@ def hdf_into_space() -> None:
         aws_secret_access_key=SPACE_SECRET,
     )
     space_name = "boolion"
-    for dir_name in os.listdir("histrical-data"):
-        for file_name in os.listdir("histrical-data/" + dir_name):
-            file_path = "histrical-data/" + dir_name + "/" + file_name
-            client.upload_file(file_path, space_name, file_path)
-
-            # 成功した場合はファイル削除
-            os.remove(file_path)
+    for file_path in Path("./histrical-data").rglob("*"):
+        if Path.is_file(file_path):
+            client.upload_file(str(file_path), space_name, str(file_path))
+            os.remove(str(file_path))
 
 
 if __name__ == "__main__":
