@@ -1,14 +1,18 @@
 from fr import get_fr_rate
 from ls import get_ls_rate
 from util import hdf_into_space
-
+import sys
 
 def main() -> None:
-    print("fr")
-    get_fr_rate()
+    target = sys.argv
 
-    print("ls")
-    get_ls_rate()
+    if "fr" in target:
+        print("fr")
+        get_fr_rate()
+
+    if "ls" in target:
+        print("ls")
+        get_ls_rate()
 
     print("hdf into space")
     hdf_into_space()
