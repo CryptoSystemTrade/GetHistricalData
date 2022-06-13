@@ -4,6 +4,7 @@ from fr import get_fr_rate
 from ls import get_ls_rate
 from oi import get_oi_rate
 from util import hdf_into_space
+from vol import get_vol_rate
 
 
 def main() -> None:
@@ -20,6 +21,10 @@ def main() -> None:
     if "oi" in target:
         print("oi")
         get_oi_rate()
+
+    if "vol" in target:
+        print("vol")
+        get_vol_rate()
 
     print("hdf into space")
     hdf_into_space()
