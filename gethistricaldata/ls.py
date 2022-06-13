@@ -1,6 +1,4 @@
-import datetime
 import json
-import os
 from typing import Dict, Union
 
 import const
@@ -39,12 +37,12 @@ def get_ls_rate() -> None:
             df["timestamp"] = df["timestamp"] / 1000
 
             # プログラム実行の前日のデータのみ取得
-            df,dt = util.filter_df(df,span="day")
+            df, dt = util.filter_df(df, span="day")
 
             # パスを指定
             dir_path = f"histrical-data/ls/{dt.year}/{dt.month}"
             file_name = f"{dt.year}_{dt.month}_{dt.day}_{currency}.h5"
-            util.save_as_hdf(df,file_name,dir_path)
+            util.save_as_hdf(df, file_name, dir_path)
 
 
 if __name__ == "__main__":

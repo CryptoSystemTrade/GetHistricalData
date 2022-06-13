@@ -1,7 +1,9 @@
+import sys
+
 from fr import get_fr_rate
 from ls import get_ls_rate
 from util import hdf_into_space
-import sys
+
 
 def main() -> None:
     target = sys.argv

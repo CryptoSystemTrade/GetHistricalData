@@ -41,7 +41,7 @@ def filter_df(df: pd.DataFrame, span: str = "day") -> Tuple[pd.DataFrame, dateti
         month = dt.month
         day = dt.day
     elif span == "month":
-        delta =  relativedelta(months=1)
+        delta = relativedelta(months=1)
         dt = dt_now - delta
         year = dt.year
         month = dt.month
