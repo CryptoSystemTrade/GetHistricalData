@@ -18,24 +18,24 @@ jobs:
           name: "Lint Check"
           command: "poetry install && poetry shell && pysen run lint"
   deploy:
-    machine:
-      image: circleci/classic:edge
+    docker:
+      - image: circleci/classic:edge
     steps:
       - checkout
-      - add_ssh_keys:
+      - add_ssh_keys
       - run: ssh ${USER_NAME}@${HOST_NAME} 'cd ~/Cron/GetHistricalData && git pull'
 
-# Invoke jobs via workflows
-# See: https://circleci.com/docs/2.0/configuration-reference/#workflows
-workflows:
-  # build ジョブと deploy ジョブを登録する
-  build_and_deploy:
-    jobs:
-      - build
-      - deploy:
-          requires:
-            # 依存性あるから deploy ジョブより先に build ジョブを実行してね、という命令
-            -build
-          filters:
-            branches:
-              only: master
+# # Invoke jobs via workflows
+# # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
+# workflows:
+#   # build ジョブと deploy ジョブを登録する
+#   build_and_deploy:
+#     jobs:
+#       - build
+#       - deploy:
+#           requires:
+#             # 依存性あるから deploy ジョブより先に build ジョブを実行してね、という命令
+#             -build
+#           filters:
+#             branches:
+#               only: master
