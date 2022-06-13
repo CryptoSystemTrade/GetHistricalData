@@ -1,5 +1,5 @@
 import json
-from typing import Dict, List
+from typing import Dict, List, Union
 
 import const
 import pandas as pd
@@ -19,7 +19,7 @@ def get_fr_rate() -> None:
     ]
 
     for currency in currencys:
-        params: Dict[str, str] = {"interval": 2, "symbol": currency}
+        params: Dict[str, Union[str, int]] = {"interval": 2, "symbol": currency}
         res = requests.get(url, headers=const.HEADERS, params=params)
 
         res_json = json.loads(res.text)
