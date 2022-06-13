@@ -7,7 +7,7 @@ import requests
 import util
 
 
-def get_fr_rate() -> None:
+def get_oi_rate() -> None:
     """
     FR比率をcoinglassから取得してHDF形式で保存
     1ヶ月ごとの実行
@@ -48,4 +48,4 @@ def get_fr_rate() -> None:
 
 
 if __name__ == "__main__":
-    get_fr_rate()
+    get_oi_rate()
