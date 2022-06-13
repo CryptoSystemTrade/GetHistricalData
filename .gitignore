@@ -2,3 +2,4 @@
 .venv
 histrical-data
 .mypy_cache
+__pycache__
