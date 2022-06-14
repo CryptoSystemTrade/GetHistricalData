@@ -40,6 +40,12 @@ jobs:
     steps:
       - add_ssh_keys
       - run: ssh ${USER_NAME}@${HOST_NAME} 'cd ~/Cron/GetHistricalData && git pull'
+      - run:
+          name: Notice to Discord
+          command: |
+            curl -sS -XPOST -H "Content-Type: application/json" \
+              -d '{"content":"Deploy Notice\r Target Branch:'"$CIRCLE_BRANCH"'\r Job URL:'"$CIRCLE_BUILD_URL"'"}'\
+              $DISCORD_WEB_HOOK_URL
 
 # # Invoke jobs via workflows
 # # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
