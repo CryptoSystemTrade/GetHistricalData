@@ -1,6 +1,8 @@
 import datetime
+import logging
 import os
 import pathlib
+import traceback
 from pathlib import Path
 from typing import Tuple
 
@@ -8,6 +10,9 @@ import boto3
 import const
 import pandas as pd
 from dateutil.relativedelta import relativedelta
+
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 
 def hdf_into_space() -> None:
@@ -65,3 +70,8 @@ def save_as_hdf(df: pd.DataFrame, file_name: str, dir_path: str) -> None:
     h5 = pd.HDFStore(dir_path + "/" + file_name, "w")
     h5["data"] = df
     h5.close()
+
+
+def error_handle() -> None:
+    error_txt = traceback.format_exc()
+    logger.error(error_txt)
