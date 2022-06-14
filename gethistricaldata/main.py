@@ -12,6 +12,7 @@ from vol import get_vol_rate
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
 
+
 def main() -> None:
     target = sys.argv
     successes: List[str] = []
